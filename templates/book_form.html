@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+    <div>Редактирование книги</div>
+    <form method="post" action="{% url 'book_update' book.id %}">
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" value="Сохранить">
+    </form>
+{% endblock content %}

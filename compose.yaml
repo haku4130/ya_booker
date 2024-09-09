@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  server:
+    build:
+      context: .
+    ports:
+      - 8000:8000
+    command: bash /app/docker-entrypoint.sh
+    depends_on:
+      - db
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: ya_booker
+      POSTGRES_USER: ya_booker_user
+      POSTGRES_PASSWORD: ya_booker_password
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+volumes:
+  pgdata:

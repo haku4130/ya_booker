@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+    {% for book in books %}
+        <div>
+            <a href="{% url 'book_detail' book.id %}">{{ book }}</a>
+        </div>
+    {% endfor %}
+    <hr>
+    <div>
+        Добавление книги
+        <form action="{% url 'book_create' %}" method="post">
+            {% csrf_token %}
+            {{ form }}
+            <input type="submit" value="Добавить">
+        </form>
+    </div>
+{% endblock content %}

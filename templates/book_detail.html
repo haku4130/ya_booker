@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+    <div>{{ book }}</div>
+    <a href="{% url 'book_update' book.id %}" role="button">Редактировать название</a>
+    <form method="post" action="{% url 'book_delete' book.id %}">
+        {% csrf_token %}
+        <input type="submit" value="Удалить книгу">
+    </form>
+    <ol>
+        {% for chapter in book.chapters.all %}
+            <li>{{ chapter.title }}</li>
+            {% if chapter.read_marks and chapter.read_marks.user == request.user %}
+                Прочитано
+            {% else %}
+                <form method="post"
+                      action="{% url 'reading_mark_create' book.pk chapter.pk %}">
+                    {% csrf_token %}
+                    <input type="submit" value="Отметить как прочитанное">
+                </form>
+            {% endif %}
+        {% endfor %}
+    </ol>
+    <hr>
+    <div>
+        Добавление главы книги
+        <form action="{% url 'chapter_create' book.id %}" method="post">
+            {% csrf_token %}
+            {{ form }}
+            <input type="submit" value="Добавить">
+        </form>
+    </div>
+{% endblock content %}
