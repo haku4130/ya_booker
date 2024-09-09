@@ -9,6 +9,8 @@ services:
     command: bash /app/docker-entrypoint.sh
     depends_on:
       - db
+    volumes:
+      - .:/app
 
   db:
     image: postgres:13

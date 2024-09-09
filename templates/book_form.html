@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load django_bootstrap5 %}
 {% block content %}
     <div>Редактирование книги</div>
     <form method="post" action="{% url 'book_update' book.id %}">

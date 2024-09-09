@@ -1,32 +1,56 @@
 {% extends "base.html" %}
+{% load django_bootstrap5 %}
 {% block content %}
-    <div>{{ book }}</div>
-    <a href="{% url 'book_update' book.id %}" role="button">Редактировать название</a>
-    <form method="post" action="{% url 'book_delete' book.id %}">
-        {% csrf_token %}
-        <input type="submit" value="Удалить книгу">
-    </form>
-    <ol>
-        {% for chapter in book.chapters.all %}
-            <li>{{ chapter.title }}</li>
-            {% if chapter.read_marks and chapter.read_marks.user == request.user %}
-                Прочитано
-            {% else %}
-                <form method="post"
-                      action="{% url 'reading_mark_create' book.pk chapter.pk %}">
+    <div class="container mt-5">
+        <!-- Название книги -->
+        <h2 class="text-center mb-4">{{ book }}</h2>
+        <!-- Кнопки редактирования и удаления -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>Главы книги</h4>
+            <div class="d-flex gap-2">
+                <a href="{% url 'book_update' book.id %}"
+                   class="btn btn-primary"
+                   role="button">Редактировать название</a>
+                <form method="post" action="{% url 'book_delete' book.id %}">
                     {% csrf_token %}
-                    <input type="submit" value="Отметить как прочитанное">
+                    <input type="submit" value="Удалить книгу" class="btn btn-danger">
                 </form>
-            {% endif %}
-        {% endfor %}
-    </ol>
-    <hr>
-    <div>
-        Добавление главы книги
-        <form action="{% url 'chapter_create' book.id %}" method="post">
-            {% csrf_token %}
-            {{ form }}
-            <input type="submit" value="Добавить">
-        </form>
+            </div>
+        </div>
+        <div class=" list-group mb-4">
+            {% for chapter in book.chapters.all %}
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>{{ forloop.counter }}. {{ chapter.title }}</div>
+                    <div>
+                        {% if chapter.read_marks and chapter.read_marks.user == request.user %}
+                            <span class="badge bg-success">Прочитано</span>
+                        {% else %}
+                            <form method="post"
+                                  action="{% url 'reading_mark_create' book.pk chapter.pk %}"
+                                  class="d-inline-block">
+                                {% csrf_token %}
+                                <input type="submit"
+                                       value="Отметить как прочитанное"
+                                       class="btn btn-outline-primary btn-sm">
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <hr>
+        <!-- Форма добавления главы книги -->
+        <div class="card">
+            <div class="card-header">Добавление главы книги</div>
+            <div class="card-body">
+                <form action="{% url 'chapter_create' book.id %}" method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="form-group mb-3">{% bootstrap_field field show_label=False %}</div>
+                    {% endfor %}
+                    {% bootstrap_button button_type="submit" content="Добавить" class="btn btn-success" %}
+                </form>
+            </div>
+        </div>
     </div>
 {% endblock content %}

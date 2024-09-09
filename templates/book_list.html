@@ -1,17 +1,36 @@
 {% extends "base.html" %}
+{% load django_bootstrap5 %}
 {% block content %}
-    {% for book in books %}
-        <div>
-            <a href="{% url 'book_detail' book.id %}">{{ book }}</a>
+    <div class="container mt-5">
+        <!-- Заголовок страницы -->
+        <h2 class="text-center mb-4">Список книг</h2>
+        <!-- Список книг -->
+        <div class="row">
+            {% for book in books %}
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <a href="{% url 'book_detail' book.id %}" class="card-link">{{ book }}</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
-    {% endfor %}
-    <hr>
-    <div>
-        Добавление книги
-        <form action="{% url 'book_create' %}" method="post">
-            {% csrf_token %}
-            {{ form }}
-            <input type="submit" value="Добавить">
-        </form>
+        <hr>
+        <!-- Форма добавления книги -->
+        <div class="card mt-4">
+            <div class="card-header">Добавление книги</div>
+            <div class="card-body">
+                <form action="{% url 'book_create' %}" method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        {% for field in form %}
+                            <div class="form-group mb-3">{% bootstrap_field field show_label=False %}</div>
+                        {% endfor %}
+                    </div>
+                    {% bootstrap_button button_type="submit" content="Добавить" class="btn btn-success" %}
+                </form>
+            </div>
+        </div>
     </div>
 {% endblock content %}

@@ -10,6 +10,7 @@ click-repl==0.3.0
 colorama==0.4.6
 cssbeautifier==1.15.1
 Django==5.1
+django-bootstrap5==24.2
 djlint==1.35.2
 EditorConfig==0.12.4
 html-tag-names==0.1.2

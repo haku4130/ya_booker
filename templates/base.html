@@ -8,10 +8,15 @@
                 Ya booker
             {% endblock title %}
         </title>
+        {% load django_bootstrap5 %}
+        {% bootstrap_css %}
+        {% bootstrap_javascript %}
     </head>
     <body>
         {% include "includes/header.html" %}
-        {% block content %}
-        {% endblock content %}
+        <div class="container pt-5">
+            {% block content %}
+            {% endblock content %}
+        </div>
     </body>
 </html>
