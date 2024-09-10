@@ -9,8 +9,9 @@ from django.views.generic import (
 )
 from django.http import HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
 
-from .models import Book, ReadingMark, Chapter
+from .models import Book, ReadingMark, Chapter, RegisterForm
 from .forms import BookForm, ChapterForm
 from .tasks import create_reading_mark
 
@@ -82,3 +83,28 @@ def create_reading_mark_view(request, book_pk, chapter_pk):
         return redirect(reverse('book_detail', kwargs={'pk': book_pk}))
 
     return HttpResponseBadRequest("Invalid request method")
+
+
+class UserRegistrationView(CreateView):
+    template_name = 'registration/registration_form.html'
+    form_class = RegisterForm
+    success_url = reverse_lazy('book_list')
+
+
+class ProfileListView(ListView):
+    model = Book
+    template_name = 'profile.html'
+
+    def get_user_profile(self):
+        return get_object_or_404(
+            get_user_model(), username=self.kwargs['username']
+        )
+
+    def get_queryset(self):
+        user_profile = self.get_user_profile()
+        return user_profile.books.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['profile'] = self.get_user_profile()
+        return context

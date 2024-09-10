@@ -7,6 +7,7 @@ from .views import (
     ChapterCreateView,
     BookUpdateView,
     BookDeleteView,
+    ProfileListView,
     create_reading_mark_view,
 )
 
@@ -29,5 +30,10 @@ urlpatterns = [
         'books/<int:book_pk>/chapters/<int:chapter_pk>/mark/',
         create_reading_mark_view,
         name='reading_mark_create',
+    ),
+    path(
+        'profile/<str:username>/',
+        ProfileListView.as_view(),
+        name='profile',
     ),
 ]
