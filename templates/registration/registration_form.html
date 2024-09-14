@@ -1,23 +1,22 @@
 {% extends "base.html" %}
 {% load django_bootstrap5 %}
 {% block content %}
-    <h2>Регистрация</h2>
-    <form method="post">
-        {% csrf_token %}
-        {% for field in form %}
-            <div class="form-group mb-3">
-                <input type="{{ field.field.widget.input_type }}"
-                       name="{{ field.html_name }}"
-                       id="{{ field.id_for_label }}"
-                       class="form-control {% if field.errors %}is-invalid{% endif %}"
-                       placeholder="{{ field.label }}"
-                       value="{{ field.value|default_if_none:'' }}">
-                {% if field.errors %}<div class="invalid-feedback">{{ field.errors.as_text }}</div>{% endif %}
+    <div class="d-flex justify-content-center align-items-center">
+        <div class="card w-75">
+            <div class="card-header">Регистрация</div>
+            <div class="card-body">
+                <form action="{% url 'registration' %}" method="post">
+                    {% csrf_token %}
+                    {% bootstrap_form form show_label=False show_help=False %}
+                    <div class="d-flex justify-content-between align-items-center">
+                        {% bootstrap_button button_type="submit" content="Зарегистрироваться" class="btn btn-success" %}
+                        <div>
+                            <span>Уже зарегистрированы?</span>
+                            <a href="{% url 'login' %}" class="ms-1">Войдите</a>
+                        </div>
+                    </div>
+                </form>
             </div>
-        {% endfor %}
-        {% bootstrap_button button_type="submit" content="Зарегистрироваться" %}
-    </form>
-    <p>
-        Уже зарегистрированы? <a href="{% url 'login' %}">Войдите</a>
-    </p>
+        </div>
+    </div>
 {% endblock %}

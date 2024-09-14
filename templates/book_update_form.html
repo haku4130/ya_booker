@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+{% block content %}
+    <div class="d-flex justify-content-center align-items-center">
+        <div class="card w-75 {% if "/delete/" in request.path %}w-auto{% endif %}">
+            <div class="card-header">
+                {% if '/update/' in request.path %}
+                    Редактирование книги
+                {% elif "/delete/" in request.path %}
+                    Подтвердите удаление книги {{ book.title }}, отменить это действие не получится.
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {% if not '/delete/' in request.path %}
+                        {% bootstrap_form form show_label=False wrapper_class="form-group mb-3" %}
+                    {% endif %}
+                    {% bootstrap_button button_type="submit" content=button_content class="btn btn-success" %}
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

@@ -1,0 +1,26 @@
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: 
+ =?utf-8?b?0KHQsdGA0L7RgSDQv9Cw0YDQvtC70Y8g0L3QsCBsb2NhbGhvc3Q6ODA4MA==?=
+From: webmaster@localhost
+To: andrejosipov19120@gmail.com
+Date: Sat, 14 Sep 2024 15:43:42 -0000
+Message-ID: <172632862287.156.3243818170574453265@81e3bb5458b9>
+
+
+Вы получили это письмо, потому что вы (или кто-то другой) запросили восстановление пароля от учётной записи на сайте localhost:8080, которая связана с этим адресом электронной почты.
+
+Пожалуйста, перейдите на эту страницу и введите новый пароль:
+
+http://localhost:8080/accounts/reset/MQ/cdcp0u-641130a45a5e56de259bc8b2cd1ca129/
+
+Ваше имя пользователя (на случай, если вы его забыли): haku
+
+Спасибо, что используете наш сайт!
+
+Команда сайта localhost:8080
+
+
+
+-------------------------------------------------------------------------------

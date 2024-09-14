@@ -1,19 +1,27 @@
 from django.urls import reverse, reverse_lazy
 from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import (
     ListView,
     DetailView,
     CreateView,
     DeleteView,
     UpdateView,
+    FormView,
 )
-from django.http import HttpResponseBadRequest
+from django.http import (
+    HttpResponseBadRequest,
+    HttpResponseRedirect,
+    HttpResponseNotAllowed,
+)
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, login, authenticate
 
-from .models import Book, ReadingMark, Chapter, RegisterForm
-from .forms import BookForm, ChapterForm
+
+from .models import Book, ReadingMark, Chapter
+from .forms import BookForm, ChapterForm, RegisterForm
 from .tasks import create_reading_mark
+from .mixins import AuthorRequiredMixin
 
 
 class BookListView(ListView):
@@ -27,32 +35,6 @@ class BookListView(ListView):
         return context
 
 
-class BookCreateView(CreateView):
-    model = Book
-    form_class = BookForm
-    success_url = reverse_lazy('book_list')
-
-
-class BookUpdateView(UpdateView):
-    model = Book
-    form_class = BookForm
-    template_name = 'book_form.html'
-
-    def get_success_url(self):
-        return reverse('book_detail', kwargs={'pk': self.kwargs['pk']})
-
-
-class BookDeleteView(DeleteView):
-    model = Book
-    form_class = BookForm
-    success_url = reverse_lazy('book_list')
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        self.object.delete()
-        return redirect(self.get_success_url())
-
-
 class BookDetailView(DetailView):
     model = Book
     template_name = 'book_detail.html'
@@ -60,6 +42,47 @@ class BookDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = ChapterForm()
+        return context
+
+
+class BookCreateView(LoginRequiredMixin, CreateView):
+    model = Book
+    form_class = BookForm
+    success_url = reverse_lazy('book_list')
+
+    def form_valid(self, form):
+        form.instance.added_by = self.request.user
+        return super().form_valid(form)
+
+
+class BookUpdateView(AuthorRequiredMixin, UpdateView):
+    model = Book
+    form_class = BookForm
+    template_name = 'book_update_form.html'
+
+    def get_success_url(self):
+        return reverse('book_detail', kwargs={'pk': self.kwargs['pk']})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['button_content'] = 'Сохранить'
+        return context
+
+
+class BookDeleteView(AuthorRequiredMixin, DeleteView):
+    model = Book
+    form_class = BookForm
+    success_url = reverse_lazy('book_list')
+    template_name = 'book_update_form.html'
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.delete()
+        return redirect(self.get_success_url())
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['button_content'] = 'Удалить'
         return context
 
 
@@ -85,10 +108,18 @@ def create_reading_mark_view(request, book_pk, chapter_pk):
     return HttpResponseBadRequest("Invalid request method")
 
 
-class UserRegistrationView(CreateView):
+class UserRegistrationView(FormView):
     template_name = 'registration/registration_form.html'
     form_class = RegisterForm
     success_url = reverse_lazy('book_list')
+
+    def form_valid(self, form):
+        form.save()
+        username = self.request.POST['username']
+        password = self.request.POST['password1']
+        user = authenticate(username=username, password=password)
+        login(self.request, user)
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class ProfileListView(ListView):
@@ -96,9 +127,7 @@ class ProfileListView(ListView):
     template_name = 'profile.html'
 
     def get_user_profile(self):
-        return get_object_or_404(
-            get_user_model(), username=self.kwargs['username']
-        )
+        return get_object_or_404(get_user_model(), username=self.kwargs['username'])
 
     def get_queryset(self):
         user_profile = self.get_user_profile()
