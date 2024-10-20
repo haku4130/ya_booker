@@ -13,9 +13,11 @@ def create_reading_mark(chapter_id, user_id):
 def get_fully_read_books(user):
     # Получаем книги, для которых количество глав равно количеству отметок о прочтении для данного пользователя
     fully_read_books = Book.objects.annotate(
-        total_chapters=Count('chapters'),
+        total_chapters=Count('chapters', distinct=True),
         read_chapters=Count(
-            'chapters__read_marks', filter=Q(chapters__read_marks__user=user)
+            'chapters__read_marks',
+            filter=Q(chapters__read_marks__user=user),
+            distinct=True,
         ),
     ).filter(read_chapters__gt=0, total_chapters=F('read_chapters'))
 
@@ -25,9 +27,13 @@ def get_fully_read_books(user):
 def get_partially_read_books(user):
     # Аннотация книг с количеством глав и количеством прочитанных глав пользователем
     partially_read_books = Book.objects.annotate(
-        total_chapters=Count('chapters'),  # Общее количество глав в книге
+        total_chapters=Count(
+            'chapters', distinct=True
+        ),  # Общее количество глав в книге
         read_chapters=Count(
-            'chapters__read_marks', filter=Q(chapters__read_marks__user=user)
+            'chapters__read_marks',
+            filter=Q(chapters__read_marks__user=user),
+            distinct=True,
         ),  # Количество прочитанных глав
     ).filter(
         read_chapters__gt=0, read_chapters__lt=F('total_chapters')

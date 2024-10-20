@@ -78,13 +78,17 @@
             </div>
             <div class="card-body">
                 {% if reading_users %}
-                    <ul class="mb-0">
+                    <div class="row">
                         {% for user in reading_users %}
-                            <li>
-                                <a href="{% url 'profile' user.username %}">{{ user.username }}</a>
-                            </li>
+                            <div class="col-3 px-1">
+                                <div class="card h-100">
+                                    <div class="card-body d-flex justify-content-center align-items-center">
+                                        <a href="{% url 'profile' user.username %}" class="card-link">{{ user.username }}</a>
+                                    </div>
+                                </div>
+                            </div>
                         {% endfor %}
-                    </ul>
+                    </div>
                 {% else %}
                     <div class="text-secondary">Никто сейчас не читает эту книгу.</div>
                 {% endif %}
@@ -97,13 +101,17 @@
             </div>
             <div class="card-body">
                 {% if completed_users %}
-                    <ul class="mb-0">
+                    <div class="row">
                         {% for user in completed_users %}
-                            <li>
-                                <a href="{% url 'profile' user.username %}">{{ user.username }}</a>
-                            </li>
+                            <div class="col-3 px-1">
+                                <div class="card h-100">
+                                    <div class="card-body d-flex justify-content-center align-items-center">
+                                        <a href="{% url 'profile' user.username %}" class="card-link">{{ user.username }}</a>
+                                    </div>
+                                </div>
+                            </div>
                         {% endfor %}
-                    </ul>
+                    </div>
                 {% else %}
                     <div class="text-secondary">Пока никто не прочитал эту книгу до конца.</div>
                 {% endif %}

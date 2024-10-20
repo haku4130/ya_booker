@@ -5,7 +5,7 @@
         <div class="card w-75 {% if "/delete/" in request.path %}w-auto{% endif %}">
             <div class="card-header">
                 {% if '/update-chapter/' in request.path %}
-                    Редактирование названия главы {{ chapter.title }} книги
+                    Глава {{ chapter.title }} книги
                     <a href="{% url 'book_detail' chapter.book.id %}">{{ chapter.book }}</a>
                 {% elif "/delete/" in request.path %}
                     Подтвердите удаление книги {{ book.title }}, отменить это действие не получится.
