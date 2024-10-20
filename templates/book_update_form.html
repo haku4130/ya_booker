@@ -5,7 +5,8 @@
         <div class="card w-75 {% if "/delete/" in request.path %}w-auto{% endif %}">
             <div class="card-header">
                 {% if '/update/' in request.path %}
-                    Редактирование книги
+                    Редактирование названия книги
+                    <a href="{% url 'book_detail' book.id %}">{{ book }}</a>
                 {% elif "/delete/" in request.path %}
                     Подтвердите удаление книги {{ book.title }}, отменить это действие не получится.
                 {% endif %}
@@ -18,6 +19,24 @@
                     {% endif %}
                     {% bootstrap_button button_type="submit" content=button_content class="btn btn-success" %}
                 </form>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-center align-items-center mt-3">
+        <div class="card mb-3 mx-4 w-75">
+            <div class="card-header">Редактирование названия глав</div>
+            <div class="list-group mx-4 my-3">
+                {% if book.chapters.all %}
+                    {% for chapter in book.chapters.all %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>{{ forloop.counter }}. {{ chapter.title }}</div>
+                            <a href="{% url 'chapter_update' book.id chapter.id %}"
+                               class="btn btn-outline-primary btn-sm">Изменить</a>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-secondary">Для этой книги пока не добавили ни одной главы</div>
+                {% endif %}
             </div>
         </div>
     </div>

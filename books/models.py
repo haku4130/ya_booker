@@ -9,6 +9,7 @@ class Book(models.Model):
         on_delete=models.CASCADE,
         related_name='books',
     )
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ('id',)
@@ -22,7 +23,7 @@ class Chapter(models.Model):
     title = models.CharField(max_length=255)
 
     def __str__(self):
-        return f"{self.book.title} - {self.title}"
+        return f'{self.book.title} - {self.title}'
 
 
 class ReadingMark(models.Model):
@@ -37,4 +38,4 @@ class ReadingMark(models.Model):
     marked_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user} read {self.chapter.title} at {self.marked_at}"
+        return f'{self.user} read {self.chapter.title} at {self.marked_at}'

@@ -20,7 +20,13 @@ from django.contrib.auth import get_user_model, login, authenticate
 
 from .models import Book, ReadingMark, Chapter
 from .forms import BookForm, ChapterForm, RegisterForm
-from .tasks import create_reading_mark
+from .tasks import (
+    create_reading_mark,
+    get_fully_read_books,
+    get_partially_read_books,
+    get_reading_users,
+    get_completed_users,
+)
 from .mixins import AuthorRequiredMixin
 
 
@@ -41,6 +47,25 @@ class BookDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user = self.request.user
+
+        if user.is_authenticated:
+            context['chapters'] = [
+                (chapter, chapter.read_marks.filter(user=user).exists())
+                for chapter in self.get_object().chapters.all()
+            ]
+        else:
+            # Если пользователь не аутентифицирован, просто передаем главы без отметок
+            context['chapters'] = [
+                (
+                    chapter,
+                    False,
+                )  # False, т.к. анонимный пользователь не может иметь отметок
+                for chapter in self.get_object().chapters.all()
+            ]
+
+        context['reading_users'] = get_reading_users(self.get_object())
+        context['completed_users'] = get_completed_users(self.get_object())
         context['form'] = ChapterForm()
         return context
 
@@ -58,6 +83,7 @@ class BookCreateView(LoginRequiredMixin, CreateView):
 class BookUpdateView(AuthorRequiredMixin, UpdateView):
     model = Book
     form_class = BookForm
+    context_object_name = 'book'
     template_name = 'book_update_form.html'
 
     def get_success_url(self):
@@ -98,14 +124,33 @@ class ChapterCreateView(CreateView):
         return reverse('book_detail', kwargs={'pk': self.kwargs['pk']})
 
 
+class ChapterUpdateView(UpdateView):
+    model = Chapter
+    form_class = ChapterForm
+    context_object_name = 'chapter'
+    template_name = 'chapter_update_form.html'
+
+    def get_object(self):
+        return get_object_or_404(
+            Chapter, pk=self.kwargs['chapter_pk'], book_id=self.kwargs['pk']
+        )
+
+    def get_success_url(self):
+        return reverse_lazy('book_detail', kwargs={'pk': self.kwargs['pk']})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['button_content'] = 'Сохранить'
+        return context
+
+
 @login_required
 def create_reading_mark_view(request, book_pk, chapter_pk):
     if request.method == 'POST':
         chapter = get_object_or_404(Chapter, pk=chapter_pk)
-        create_reading_mark.delay(chapter.id, request.user.id)
-        return redirect(reverse('book_detail', kwargs={'pk': book_pk}))
+        create_reading_mark(chapter.id, request.user.id)
 
-    return HttpResponseBadRequest("Invalid request method")
+    return redirect(reverse('book_detail', kwargs={'pk': book_pk}))
 
 
 class UserRegistrationView(FormView):
@@ -135,5 +180,8 @@ class ProfileListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['profile'] = self.get_user_profile()
+        user = self.get_user_profile()
+        context['profile'] = user
+        context['fully_read_books'] = get_fully_read_books(user)
+        context['partially_read_books'] = get_partially_read_books(user)
         return context

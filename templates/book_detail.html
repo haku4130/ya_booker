@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load django_bootstrap5 %}
 {% block content %}
-    <div class="container mt-5">
+    <div class="container">
         <h2 class="text-center mb-4">{{ book }}</h2>
         <div class="card">
             <div class="d-flex justify-content-between align-items-center card-header mb-3">
@@ -9,37 +9,43 @@
                 <div class="d-flex gap-2">
                     <a href="{% url 'book_update' book.id %}"
                        class="btn btn-primary"
-                       role="button">Редактировать название</a>
+                       role="button">Редактировать</a>
                     <a href="{% url 'book_delete' book.id %}" class="btn btn-danger">Удалить книгу</a>
                 </div>
             </div>
-            <div class=" list-group mb-4">
-                {% for chapter in book.chapters.all %}
-                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>{{ forloop.counter }}. {{ chapter.title }}</div>
-                        <div>
-                            {% if chapter.read_marks and chapter.read_marks.user == request.user %}
-                                <span class="badge bg-success">Прочитано</span>
-                            {% else %}
-                                <form method="post"
-                                      action="{% url 'reading_mark_create' book.pk chapter.pk %}"
-                                      class="d-inline-block">
-                                    {% csrf_token %}
-                                    <input type="submit"
-                                           value="Отметить как прочитанное"
-                                           class="btn btn-outline-primary btn-sm">
-                                </form>
-                            {% endif %}
+            <div class="list-group mb-3 mx-4">
+                {% if chapters %}
+                    {% for chapter, is_read in chapters %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>{{ forloop.counter }}. {{ chapter.title }}</div>
+                            <div>
+                                {% if is_read %}
+                                    <span class="badge bg-success p-2">Прочитано</span>
+                                {% else %}
+                                    <form method="post"
+                                          action="{% url 'reading_mark_create' book.pk chapter.pk %}"
+                                          class="d-inline-block">
+                                        {% csrf_token %}
+                                        <input type="submit"
+                                               value="Отметить как прочитанное"
+                                               class="btn btn-outline-primary btn-sm">
+                                    </form>
+                                {% endif %}
+                            </div>
                         </div>
-                    </div>
-                {% endfor %}
+                    {% endfor %}
+                {% else %}
+                    <div class="text-secondary">Для этой книги пока не добавили ни одной главы</div>
+                {% endif %}
             </div>
         </div>
         <!-- Форма добавления главы книги -->
         {% if request.user == book.added_by %}
             <hr>
             <div class="card">
-                <div class="card-header">Добавление главы книги</div>
+                <div class="card-header">
+                    <h5 class="my-1">Добавление главы книги</h5>
+                </div>
                 <div class="card-body">
                     <form action="{% url 'chapter_create' book.id %}" method="post">
                         {% csrf_token %}
@@ -49,5 +55,59 @@
                 </div>
             </div>
         {% endif %}
+        <hr>
+        <!-- Информация о том, кем была добавлена книга и когда -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="my-1">Информация о книге</h5>
+            </div>
+            <div class="card-body">
+                <p>
+                    <strong>Добавлена пользователем:</strong>
+                    <a href="{% url 'profile' book.added_by.username %}">{{ book.added_by.username }}</a>
+                </p>
+                <div>
+                    <strong>Дата добавления:</strong> {{ book.created_at|date:"d M Y" }}
+                </div>
+            </div>
+        </div>
+        <!-- Пользователи, которые находятся в процессе чтения книги -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="my-1">Читают книгу</h5>
+            </div>
+            <div class="card-body">
+                {% if reading_users %}
+                    <ul class="mb-0">
+                        {% for user in reading_users %}
+                            <li>
+                                <a href="{% url 'profile' user.username %}">{{ user.username }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="text-secondary">Никто сейчас не читает эту книгу.</div>
+                {% endif %}
+            </div>
+        </div>
+        <!-- Пользователи, которые прочитали книгу полностью -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="my-1">Прочитали книгу полностью</h5>
+            </div>
+            <div class="card-body">
+                {% if completed_users %}
+                    <ul class="mb-0">
+                        {% for user in completed_users %}
+                            <li>
+                                <a href="{% url 'profile' user.username %}">{{ user.username }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="text-secondary">Пока никто не прочитал эту книгу до конца.</div>
+                {% endif %}
+            </div>
+        </div>
     </div>
 {% endblock content %}

@@ -5,6 +5,7 @@ from .views import (
     BookDetailView,
     BookCreateView,
     ChapterCreateView,
+    ChapterUpdateView,
     BookUpdateView,
     BookDeleteView,
     ProfileListView,
@@ -21,6 +22,11 @@ urlpatterns = [
         'books/<int:pk>/add-chapter/',
         ChapterCreateView.as_view(),
         name='chapter_create',
+    ),
+    path(
+        'books/<int:pk>/update-chapter/<int:chapter_pk>/',
+        ChapterUpdateView.as_view(),
+        name='chapter_update',
     ),
     path(
         'books/<int:book_pk>/chapters/<int:chapter_pk>/mark/',
