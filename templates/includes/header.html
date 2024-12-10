@@ -1,16 +1,28 @@
 {% load django_bootstrap5 %}
 <header class="d-flex justify-content-between align-items-center p-3 mb-4 border-bottom">
-    <a href="{% url 'book_list' %}" class="btn btn-outline-primary">На главную</a>
-    {% if request.user.is_authenticated %}
-        <div class="d-flex align-items-center">
-            <a href="{% url 'profile' request.user.username %}"
-               class="btn btn-outline-secondary me-3">{{ request.user.username }}</a>
-            <form action="{% url 'logout' %}" method="post">
-                {% csrf_token %}
-                {% bootstrap_button button_type="submit" content="Выйти" class="btn btn-outline-danger" %}
-            </form>
-        </div>
-    {% else %}
-        <a href="{% url 'login' %}" class="btn btn-outline-success">Войти</a>
-    {% endif %}
+    <div>
+        <a href="{% url 'book_list' %}" class="btn btn-outline-primary">На главную</a>
+        <a href="{% url 'feedback_form' %}"
+           class="btn btn-outline-secondary ms-2">Обратная связь</a>
+    </div>
+    <div class="d-flex">
+        {% comment %} <form method="get" action="{% url 'book_list' %}" class="me-2">
+            <div class="input-group">
+                <input type="text" class="form-control" name="search" value="{{ search_query }}" placeholder="Поиск по книгам">
+                <button class="btn btn-outline-secondary" type="submit">Искать</button>
+            </div>
+        </form> {% endcomment %}
+        {% if request.user.is_authenticated %}
+            <div class="d-flex align-items-center">
+                <a href="{% url 'profile' request.user.username %}"
+                   class="btn btn-outline-secondary me-2">{{ request.user.username }}</a>
+                <form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    {% bootstrap_button button_type="submit" content="Выйти" button_class="btn btn-outline-danger" %}
+                </form>
+            </div>
+        {% else %}
+            <a href="{% url 'login' %}" class="btn btn-outline-success">Войти</a>
+        {% endif %}
+    </div>
 </header>

@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container mt-5 text-center">
+        <h1>404 — Страница не найдена</h1>
+        <p>К сожалению, запрашиваемая страница не существует.</p>
+        <a href={% url 'book_list' %} class="btn btn-primary">На главную</a>
+    </div>
+{% endblock content %}

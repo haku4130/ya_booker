@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+{% block content %}
+    <div class="container">
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5>
+                    Заявка от: <span class="fw-light">
+                    {% if feedback.user %}
+                        {{ feedback.user.username }}
+                    {% else %}
+                        Анонимный
+                    {% endif %}
+                </span>
+            </h5>
+            <hr>
+            <h5>
+                Сообщение: <span class="fw-light">{{ feedback.message }}</span>
+            </h5>
+            <hr>
+            <h5>
+                Дата отправки: <span class="fw-light">{{ feedback.created_at }}</span>
+            </h5>
+        </div>
+    </div>
+    {% if feedback.is_responded %}
+        <p>
+            <strong>Ответ:</strong> {{ feedback.response }}
+        </p>
+    {% else %}
+        <form method="post">
+            {% csrf_token %}
+            <textarea name="response"
+                      class="form-control"
+                      rows="4"
+                      placeholder="Введите ответ..."></textarea>
+            <button type="submit" class="btn btn-primary mt-2">Ответить</button>
+        </form>
+    {% endif %}
+</div>
+{% endblock content %}

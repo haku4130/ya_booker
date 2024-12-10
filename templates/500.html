@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container mt-5 text-center">
+        <h1>500 — Внутренняя ошибка сервера</h1>
+        <p>Произошла ошибка на сервере. Мы уже работаем над её исправлением.</p>
+        <a href={% url 'book_list' %} class="btn btn-primary">На главную</a>
+    </div>
+{% endblock content %}
